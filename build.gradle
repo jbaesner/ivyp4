@@ -17,31 +17,22 @@ repositories {
   flatDir name: 'localp4java', dirs: 'p4java'
 }
 
-def buildDate = new Date()
+def buildDateFormat = new java.text.SimpleDateFormat("yMMdd")
+def buildDate = buildDateFormat.format(new Date())
+
+// tests not ported yet
+test.onlyIf { false }
 
 jar {
-  manifest {
-    attributes(
-        "Build-Version": "0.1-tomtec",
-        "Build-DateTime":buildDate)
-  }
+  version = "0.1-${buildDate}"
+  baseName = "ivyp4resolver"
 }
 
 dependencies {
   compile 'p4java:p4java:2012.3.526908'
-  compile 'org.apache.ivy:ivy:2.3.0-rc1'
+  compile 'org.apache.ivy:ivy:2.2.0'
   compile 'commons-io:commons-io:2.0'
   compile('org.apache.ant:ant:1.8.2') { transitive = true }
 
   testCompile 'junit:junit:4.+'
-}
-
-jar { task ->
-  def archiveToCopy = task.archivePath
-  doLast{
-    copy {
-      from archiveToCopy
-      into 'D:/P4/Head/Extern/ant/lib'
-    }
-  }
 }
