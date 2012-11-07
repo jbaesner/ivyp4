@@ -2,6 +2,14 @@
 Ivy P4
 ====================
 
+Forked from Felix Drueke's ivyp4:
+- Fixed some path handling bugs in P4Resolver
+- Fixed listing of "deleted" files
+- Upgraded to p4java p4java-2012.3.526908 
+- Use gradle 1.2 to build (tests not ported yet).
+
+From original README:
+
 IvyP4 implements a resolver for `Ivy <http://ant.apache.org/ivy/>` for that allows
 you to use the SCM system `Perforce <http://www.perforce.com/>` as a repository for
 artifacts.
