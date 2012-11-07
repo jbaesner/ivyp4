@@ -35,6 +35,7 @@ import org.apache.ivy.plugins.repository.Resource;
 import org.apache.ivy.plugins.repository.TransferEvent;
 import org.apache.ivy.util.Message;
 
+import com.perforce.p4java.core.file.FileAction;
 import com.perforce.p4java.core.file.FileSpecBuilder;
 import com.perforce.p4java.core.file.IExtendedFileSpec;
 import com.perforce.p4java.core.file.IFileSpec;
@@ -300,9 +301,15 @@ public class P4Repository extends AbstractRepository {
 		}
 
 		try {
+		  
+		  if (parent.endsWith("/"))
+		  {
+		    parent = parent.substring(0, parent.length()-1);
+		  }
+		  
 			List<String> list = new ArrayList<String>();
 			List<IFileSpec> depotFiles = server.getDepotFiles(FileSpecBuilder.makeFileSpecList(parent + "/*"), false);
-			List<IFileSpec> depotDirs = server.getDirectories(FileSpecBuilder.makeFileSpecList(parent + "*"), false, false, false);
+			List<IFileSpec> depotDirs = server.getDirectories(FileSpecBuilder.makeFileSpecList(parent + "/*"), false, false, false);
 
 			// Add files to return list
 			if ((depotFiles != null) &&		// Make this bullet-proof since the p4java-api sometimes returns weird results
@@ -310,11 +317,17 @@ public class P4Repository extends AbstractRepository {
 					(depotFiles.get(0) != null) &&
 					(depotFiles.get(0).getAction() != null)) {
 				for ( Iterator<IFileSpec> iterator = depotFiles.iterator(); iterator.hasNext(); ) {
-					String path = iterator.next().getDepotPathString();
-					if (path != null) {
-						String[] parts = path.split("/", -1);
-						list.add(parts[parts.length - 1]);
-					}
+				  
+				  IFileSpec spec = iterator.next();
+				  
+				  if (spec.getAction() != null)
+				  {
+				    if ((spec.getAction() != FileAction.DELETED)&&(spec.getAction() != FileAction.DELETE))
+				    {
+				      String path = spec.getDepotPathString();
+				      list.add(path);
+				    }
+				  }
 				}
 			}
 			// Add directories to return list
@@ -323,8 +336,7 @@ public class P4Repository extends AbstractRepository {
 				for ( Iterator<IFileSpec> iterator = depotDirs.iterator(); iterator.hasNext(); ) {
 					String path = iterator.next().getOriginalPathString();
 					if (path != null) {
-						String[] parts = path.split("/", -1);
-						list.add(parts[parts.length - 1]);
+					  list.add(path);
 					}
 				}
 			}
