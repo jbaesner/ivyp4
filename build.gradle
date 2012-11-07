@@ -1,0 +1,47 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+sourceSets {
+  main {
+    java { srcDir 'src' }
+  }
+  test {
+    java { srcDir 'test' }
+  }
+}
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+
+repositories {
+  mavenCentral()
+  flatDir name: 'localp4java', dirs: 'p4java'
+}
+
+def buildDate = new Date()
+
+jar {
+  manifest {
+    attributes(
+        "Build-Version": "0.1-tomtec",
+        "Build-DateTime":buildDate)
+  }
+}
+
+dependencies {
+  compile 'p4java:p4java:2012.3.526908'
+  compile 'org.apache.ivy:ivy:2.3.0-rc1'
+  compile 'commons-io:commons-io:2.0'
+  compile('org.apache.ant:ant:1.8.2') { transitive = true }
+
+  testCompile 'junit:junit:4.+'
+}
+
+jar { task ->
+  def archiveToCopy = task.archivePath
+  doLast{
+    copy {
+      from archiveToCopy
+      into 'D:/P4/Head/Extern/ant/lib'
+    }
+  }
+}
